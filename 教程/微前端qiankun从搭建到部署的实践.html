@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<!-- saved from url=(0050)https://www.fengxianqi.com/index.php/archives/157/ -->
+<html class="no-js"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>微前端qiankun从搭建到部署的实践 - fengxianqi</title>
+
+        <!-- 使用url函数转换相关路径 -->
+        <link rel="stylesheet" href="微前端qiankun从搭建到部署的实践/normalize.css">
+        <link rel="stylesheet" href="微前端qiankun从搭建到部署的实践/bootstrap.min.css">
+        <link rel="stylesheet" href="微前端qiankun从搭建到部署的实践/font-awesome.min.css">
+        <link rel="stylesheet" href="微前端qiankun从搭建到部署的实践/typo.css">
+        <link rel="stylesheet" href="微前端qiankun从搭建到部署的实践/style.css">
+        <link rel="stylesheet" href="微前端qiankun从搭建到部署的实践/even.css">
+        
+
+    <!--[if lt IE 9]>
+    <script src="//cdn.bootcss.com/html5shiv/r29/html5.min.js"></script>
+    <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- 通过自有函数输出HTML头部信息 -->
+<meta name="description" content="最近负责的新项目用到了qiankun，写篇文章分享下实战中遇到的一些问题和思考。示例代码： https://github.com/fengxianqi/qiankun-example。在线dem...">
+<meta name="keywords" content="qiankun,微前端,qiankun-example,qiankun-demo">
+<link rel="pingback" href="https://www.fengxianqi.com/index.php/action/xmlrpc">
+<link rel="alternate" type="application/rss+xml" title="微前端qiankun从搭建到部署的实践 » fengxianqi » RSS 2.0" href="https://www.fengxianqi.com/index.php/feed/archives/157/">
+<link rel="alternate" type="application/rdf+xml" title="微前端qiankun从搭建到部署的实践 » fengxianqi » RSS 1.0" href="https://www.fengxianqi.com/index.php/feed/rss/archives/157/">
+<link rel="alternate" type="application/atom+xml" title="微前端qiankun从搭建到部署的实践 » fengxianqi » ATOM 1.0" href="https://www.fengxianqi.com/index.php/feed/atom/archives/157/">
+<link rel="stylesheet" type="text/css" href="微前端qiankun从搭建到部署的实践/segmentfault.css"></head>
+<body>
+<!--[if lt IE 8]>
+    <div class="browsehappy" role="dialog">当前网页 <strong>不支持</strong> 你正在使用的浏览器. 为了正常的访问, 请 <a href="http://browsehappy.com/">升级你的浏览器</a>.</div>
+<![endif]-->
+<header id="header" class="header">
+    <div class="container">
+        <nav class="navbar navbar-expand-md navbar-light">
+                            <a id="logo" class="logo" href="https://www.fengxianqi.com/">fengxianqi</a>
+                <!-- <p class="description">前端实战笔录；静心沉淀，思考进阶。</p> -->
+                        <button class="navbar-toggler navbar-toggler-left" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.fengxianqi.com/"><span>首页</span></a>
+                    </li>
+                                                                <li class="nav-item">
+                            <a class="nav-link" href="https://www.fengxianqi.com/index.php/gbook.html" title="留言"><span>留言</span></a>
+                        </li>
+                                            <li class="nav-item">
+                            <a class="nav-link" href="https://www.fengxianqi.com/index.php/archives.html" title="归档"><span>归档</span></a>
+                        </li>
+                                            <li class="nav-item">
+                            <a class="nav-link" href="https://www.fengxianqi.com/index.php/about.html" title="关于"><span>关于</span></a>
+                        </li>
+                                            <li class="nav-item">
+                            <a class="nav-link" href="https://www.fengxianqi.com/index.php/demo.html" title="前端demo"><span>前端demo</span></a>
+                        </li>
+                                            <li class="nav-item">
+                            <a class="nav-link" href="https://www.fengxianqi.com/index.php/friends.html" title="友链"><span>友链</span></a>
+                        </li>
+                      
+                </ul>
+                <div class="site-search kit-hidden-tb">
+                    <form id="search" class="form-inline" method="post" action="https://www.fengxianqi.com/" role="search">
+                        <label for="s" class="sr-only">搜索关键字</label>
+                        <input type="text" id="s" name="s" placeholder="输入关键字搜索">
+                        <button type="submit" class="search-btn"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>                               
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </div>
+</header>
+<div class="hideheader" style="height: 53.2054px; display: none;"></div>
+
+<div id="body" class="body">
+    <div class="container">
+        <div class="row">
+<div class="col-sm-12 col-lg-10 post-main" id="main" role="main">
+    <article class="post Card typo" itemscope="" itemtype="http://schema.org/BlogPosting">       
+        <div class="post-box paddingall">
+            <div class="post-title-box">
+            <h1 class="post-title" itemprop="name headline">微前端qiankun从搭建到部署的实践</h1>
+            </div>
+            <div class="tags-box">本文共有26285个字，关键词：<span itemprop="keywords" class="tags"><a href="https://www.fengxianqi.com/index.php/tag/qiankun/">qiankun</a>、<a href="https://www.fengxianqi.com/index.php/tag/%E5%BE%AE%E5%89%8D%E7%AB%AF/">微前端</a>、<a href="https://www.fengxianqi.com/index.php/tag/qiankun-example/">qiankun-example</a>、<a href="https://www.fengxianqi.com/index.php/tag/qiankun-demo/">qiankun-demo</a></span></div>
+            <div class="post-content" itemprop="articleBody">
+                <p>最近负责的新项目用到了<code>qiankun</code>，写篇文章分享下实战中遇到的一些问题和思考。</p><p>示例代码： <a href="https://github.com/fengxianqi/qiankun-example">https://github.com/fengxianqi/qiankun-example</a>。</p><p>在线demo：<a href="http://qiankun.fengxianqi.com/">http://qiankun.fengxianqi.com/</a></p><p>单独访问在线子应用：</p><ul><li><a href="http://qiankun.fengxianqi.com/subapp/sub-vue/">subapp/sub-vue</a></li><li><a href="http://qiankun.fengxianqi.com/subapp/sub-react/">subapp/sub-react</a></li></ul><h2>为什么要用qiankun</h2><p>项目有个功能需求是需要内嵌公司内部的一个现有工具，该工具是独立部署的且是用<code>React</code>写的，而我们的项目主要技术选型是<code>vue</code>，因此需要考虑嵌入页面的方案。主要有两条路：</p><ul><li><code>iframe</code>方案</li><li><code>qiankun</code>微前端方案</li></ul><p>两种方案都能满足我们的需求且是可行的。不得不说，<code>iframe</code>方案虽然普通但很实用且成本也低，<code>iframe</code>方案能覆盖大部分的微前端业务需求，而<code>qiankun</code>对技术要求更高一些。</p><p>技术同学对自身的成长也是有强烈需求的，因此在两者都能满足业务需求时，我们更希望能应用一些较新的技术，折腾一些未知的东西，因此我们决定选用<code>qiankun</code>。</p><h2>项目架构</h2><p>后台系统一般都是上下或左右的布局。下图粉红色是基座，只负责头部导航，绿色是挂载的整个子应用，点击头部导航可切换子应用。<br><img src="微前端qiankun从搭建到部署的实践/4096430442.png" alt="2776112296-657eed9d6151ac64_articlex.png" title="2776112296-657eed9d6151ac64_articlex.png"></p><p>参考官方的<a href="https://github.com/umijs/qiankun/tree/master/examples">examples</a>代码，项目根目录下有基座<code>main</code>和其他子应用<code>sub-vue</code>，<code>sub-react</code>，搭建后的初始目录结构如下：</p><pre><code class="hljs less cpp">
+├── <span class="hljs-selector-tag">common</span>     <span class="hljs-comment"><span class="hljs-comment">//公共模块</span></span>
+├── <span class="hljs-selector-tag">main</span>       <span class="hljs-comment"><span class="hljs-comment">// 基座</span></span>
+├── <span class="hljs-selector-tag">sub-react</span>  <span class="hljs-comment"><span class="hljs-comment">// react子应用</span></span>
+└── <span class="hljs-selector-tag">sub-vue</span>    <span class="hljs-comment"><span class="hljs-comment">// vue子应用</span></span></code></pre><p>基座是用<code>vue</code>搭建，子应用有<code>react</code>和<code>vue</code>。</p><h2>基座配置</h2><p>基座main采用是的Vue-Cli3搭建的，它只负责导航的渲染和登录态的下发，为子应用提供一个挂载的容器div，基座应该保持简洁（qiankun官方demo甚至直接使用原生html搭建），不应该做涉及业务的操作。</p><p>qiankun这个库只需要在基座引入，在<code>main.js</code>中注册子应用,为了方便管理，我们将子应用的配置都放在：<code>main/src/micro-app.js</code>下。</p><pre><code class="lang-javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">const</span></span> microApps = [
+  {
+    <span class="hljs-attr"><span class="hljs-attr">name</span></span>: <span class="hljs-string"><span class="hljs-string">'sub-vue'</span></span>,
+    <span class="hljs-attr"><span class="hljs-attr">entry</span></span>: <span class="hljs-string"><span class="hljs-string">'//localhost:7777/'</span></span>,
+    <span class="hljs-attr"><span class="hljs-attr">activeRule</span></span>: <span class="hljs-string"><span class="hljs-string">'/sub-vue'</span></span>,
+    <span class="hljs-attr"><span class="hljs-attr">container</span></span>: <span class="hljs-string"><span class="hljs-string">'#subapp-viewport'</span></span>, <span class="hljs-comment"><span class="hljs-comment">// 子应用挂载的div</span></span>
+    props: {
+      <span class="hljs-attr"><span class="hljs-attr">routerBase</span></span>: <span class="hljs-string"><span class="hljs-string">'/sub-vue'</span></span> <span class="hljs-comment"><span class="hljs-comment">// 下发路由给子应用，子应用根据该值去定义qiankun环境下的路由</span></span>
+    }
+  },
+  {
+    <span class="hljs-attr"><span class="hljs-attr">name</span></span>: <span class="hljs-string"><span class="hljs-string">'sub-react'</span></span>,
+    <span class="hljs-attr"><span class="hljs-attr">entry</span></span>: <span class="hljs-string"><span class="hljs-string">'//localhost:7788/'</span></span>,
+    <span class="hljs-attr"><span class="hljs-attr">activeRule</span></span>: <span class="hljs-string"><span class="hljs-string">'/sub-react'</span></span>,
+    <span class="hljs-attr"><span class="hljs-attr">container</span></span>: <span class="hljs-string"><span class="hljs-string">'#subapp-viewport'</span></span>, <span class="hljs-comment"><span class="hljs-comment">// 子应用挂载的div</span></span>
+    props: {
+      <span class="hljs-attr"><span class="hljs-attr">routerBase</span></span>: <span class="hljs-string"><span class="hljs-string">'/sub-react'</span></span>
+    }
+  }
+]
+
+<span class="hljs-keyword"><span class="hljs-keyword">export</span></span> <span class="hljs-keyword"><span class="hljs-keyword">default</span></span> microApps
+</code></pre><p>然后在<code>src/main.js</code>中引入</p><pre><code class="lang-javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">import</span></span> Vue <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'vue'</span></span>;
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> App <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'./App.vue'</span></span>;
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> { registerMicroApps, start } <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'qiankun'</span></span>;
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> microApps <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'./micro-app'</span></span>;
+
+Vue.config.productionTip = <span class="hljs-literal"><span class="hljs-literal">false</span></span>;
+
+<span class="hljs-keyword"><span class="hljs-keyword">new</span></span> Vue({
+  <span class="hljs-attr"><span class="hljs-attr">render</span></span>: <span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">h</span></span></span><span class="hljs-function"> =&gt;</span></span> h(App),
+}).$mount(<span class="hljs-string"><span class="hljs-string">'#app'</span></span>);
+
+
+registerMicroApps(microApps, {
+  <span class="hljs-attr"><span class="hljs-attr">beforeLoad</span></span>: <span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">app</span></span></span><span class="hljs-function"> =&gt;</span></span> {
+    <span class="hljs-built_in"><span class="hljs-built_in">console</span></span>.log(<span class="hljs-string"><span class="hljs-string">'before load app.name====&gt;&gt;&gt;&gt;&gt;'</span></span>, app.name)
+  },
+  <span class="hljs-attr"><span class="hljs-attr">beforeMount</span></span>: [
+    <span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">app</span></span></span><span class="hljs-function"> =&gt;</span></span> {
+      <span class="hljs-built_in"><span class="hljs-built_in">console</span></span>.log(<span class="hljs-string"><span class="hljs-string">'[LifeCycle] before mount %c%s'</span></span>, <span class="hljs-string"><span class="hljs-string">'color: green;'</span></span>, app.name);
+    },
+  ],
+  <span class="hljs-attr"><span class="hljs-attr">afterMount</span></span>: [
+    <span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">app</span></span></span><span class="hljs-function"> =&gt;</span></span> {
+      <span class="hljs-built_in"><span class="hljs-built_in">console</span></span>.log(<span class="hljs-string"><span class="hljs-string">'[LifeCycle] after mount %c%s'</span></span>, <span class="hljs-string"><span class="hljs-string">'color: green;'</span></span>, app.name);
+    }
+  ],
+  <span class="hljs-attr"><span class="hljs-attr">afterUnmount</span></span>: [
+    <span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">app</span></span></span><span class="hljs-function"> =&gt;</span></span> {
+      <span class="hljs-built_in"><span class="hljs-built_in">console</span></span>.log(<span class="hljs-string"><span class="hljs-string">'[LifeCycle] after unmount %c%s'</span></span>, <span class="hljs-string"><span class="hljs-string">'color: green;'</span></span>, app.name);
+    },
+  ],
+});
+
+start();</code></pre><p>在<code>App.vue</code>中，需要声明<code>micro-app.js</code>配置的子应用挂载div（注意id一定要一致），以及基座布局相关的，大概这样：</p><pre><code class="lang-html hljs xml"><span class="hljs-tag"><span class="hljs-tag">&lt;</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">template</span></span></span><span class="hljs-tag">&gt;</span></span>
+  <span class="hljs-tag"><span class="hljs-tag">&lt;</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">div</span></span></span><span class="hljs-tag"> </span><span class="hljs-attr"><span class="hljs-tag"><span class="hljs-attr">id</span></span></span><span class="hljs-tag">=</span><span class="hljs-string"><span class="hljs-tag"><span class="hljs-string">"layout-wrapper"</span></span></span><span class="hljs-tag">&gt;</span></span>
+    <span class="hljs-tag"><span class="hljs-tag">&lt;</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">div</span></span></span><span class="hljs-tag"> </span><span class="hljs-attr"><span class="hljs-tag"><span class="hljs-attr">class</span></span></span><span class="hljs-tag">=</span><span class="hljs-string"><span class="hljs-tag"><span class="hljs-string">"layout-header"</span></span></span><span class="hljs-tag">&gt;</span></span>头部导航<span class="hljs-tag"><span class="hljs-tag">&lt;/</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">div</span></span></span><span class="hljs-tag">&gt;</span></span>
+    <span class="hljs-tag"><span class="hljs-tag">&lt;</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">div</span></span></span><span class="hljs-tag"> </span><span class="hljs-attr"><span class="hljs-tag"><span class="hljs-attr">id</span></span></span><span class="hljs-tag">=</span><span class="hljs-string"><span class="hljs-tag"><span class="hljs-string">"subapp-viewport"</span></span></span><span class="hljs-tag">&gt;</span></span><span class="hljs-tag"><span class="hljs-tag">&lt;/</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">div</span></span></span><span class="hljs-tag">&gt;</span></span>
+  <span class="hljs-tag"><span class="hljs-tag">&lt;/</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">div</span></span></span><span class="hljs-tag">&gt;</span></span>
+<span class="hljs-tag"><span class="hljs-tag">&lt;/</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">template</span></span></span><span class="hljs-tag">&gt;</span></span>
+</code></pre><p>这样，基座就算配置完成了。项目启动后，子应用将会挂载到<code>&lt;div id="subapp-viewport"&gt;&lt;/div&gt;</code>中。</p><h2>子应用配置</h2><h3>一、vue子应用</h3><p>用Vue-cli在项目根目录新建一个<code>sub-vue</code>的子应用，子应用的名称最好与父应用在<code>src/micro-app.js</code>中配置的名称一致（这样可以直接使用<code>package.json</code>中的<code>name</code>作为output）。</p><ol><li>新增<code>vue.config.js</code>，devServer的端口改为与主应用配置的一致,且加上跨域<code>headers</code>和<code>output</code>配置。</li></ol><pre><code class="lang-javascript hljs"><span class="hljs-comment"><span class="hljs-comment">// package.json的name需注意与主应用一致</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">const</span></span> { name } = <span class="hljs-built_in"><span class="hljs-built_in">require</span></span>(<span class="hljs-string"><span class="hljs-string">'../package.json'</span></span>)
+
+<span class="hljs-built_in"><span class="hljs-built_in">module</span></span>.exports = {
+  <span class="hljs-attr"><span class="hljs-attr">configureWebpack</span></span>: {
+    <span class="hljs-attr"><span class="hljs-attr">output</span></span>: {
+      <span class="hljs-attr"><span class="hljs-attr">library</span></span>: <span class="hljs-string"><span class="hljs-string">`</span><span class="hljs-subst"><span class="hljs-string"><span class="hljs-subst">${name}</span></span></span><span class="hljs-string">-[name]`</span></span>,
+      <span class="hljs-attr"><span class="hljs-attr">libraryTarget</span></span>: <span class="hljs-string"><span class="hljs-string">'umd'</span></span>,
+      <span class="hljs-attr"><span class="hljs-attr">jsonpFunction</span></span>: <span class="hljs-string"><span class="hljs-string">`webpackJsonp_</span><span class="hljs-subst"><span class="hljs-string"><span class="hljs-subst">${name}</span></span></span><span class="hljs-string">`</span></span>,
+    }
+  },
+  <span class="hljs-attr"><span class="hljs-attr">devServer</span></span>: {
+    <span class="hljs-attr"><span class="hljs-attr">port</span></span>: process.env.VUE_APP_PORT, <span class="hljs-comment"><span class="hljs-comment">// 在.env中VUE_APP_PORT=7788，与父应用的配置一致</span></span>
+    headers: {
+      <span class="hljs-string"><span class="hljs-string">'Access-Control-Allow-Origin'</span></span>: <span class="hljs-string"><span class="hljs-string">'*'</span></span> <span class="hljs-comment"><span class="hljs-comment">// 主应用获取子应用时跨域响应头</span></span>
+    }
+  }
+}</code></pre><ol><li>新增<code>src/public-path.js</code></li></ol><pre><code class="lang-javascript hljs">(<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function">(</span><span class="hljs-params"></span><span class="hljs-function"><span class="hljs-params"></span>) </span></span>{
+  <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (<span class="hljs-built_in"><span class="hljs-built_in">window</span></span>.__POWERED_BY_QIANKUN__) {
+    <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (process.env.NODE_ENV === <span class="hljs-string"><span class="hljs-string">'development'</span></span>) {
+      <span class="hljs-comment"><span class="hljs-comment">// eslint-disable-next-line no-undef</span></span>
+      __webpack_public_path__ = <span class="hljs-string"><span class="hljs-string">`//localhost:</span><span class="hljs-subst"><span class="hljs-string"><span class="hljs-subst">${process.env.VUE_APP_PORT}</span></span></span><span class="hljs-string">/`</span></span>;
+      <span class="hljs-keyword"><span class="hljs-keyword">return</span></span>;
+    }
+    <span class="hljs-comment"><span class="hljs-comment">// eslint-disable-next-line no-undef</span></span>
+    __webpack_public_path__ = <span class="hljs-built_in"><span class="hljs-built_in">window</span></span>.__INJECTED_PUBLIC_PATH_BY_QIANKUN__;
+  }
+})();</code></pre><ol><li><code>src/router/index.js</code>改为只暴露routes，<code>new Router</code>改到<code>main.js</code>中声明。</li><li>改造<code>main.js</code>，引入上面的<code>public-path.js</code>，改写render，添加生命周期函数等，最终如下：</li></ol><pre><code class="lang-javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">import</span></span> <span class="hljs-string"><span class="hljs-string">'./public-path'</span></span> <span class="hljs-comment"><span class="hljs-comment">// 注意需要引入public-path</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> Vue <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'vue'</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> App <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'./App.vue'</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> routes <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'./router'</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> store <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'./store'</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> VueRouter <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'vue-router'</span></span>
+
+Vue.config.productionTip = <span class="hljs-literal"><span class="hljs-literal">false</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">let</span></span> instance = <span class="hljs-literal"><span class="hljs-literal">null</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">render</span></span></span><span class="hljs-function"> (</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">props = {}</span></span></span><span class="hljs-function">) </span></span>{
+  <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> { container, routerBase } = props
+  <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> router = <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> VueRouter({
+    <span class="hljs-attr"><span class="hljs-attr">base</span></span>: <span class="hljs-built_in"><span class="hljs-built_in">window</span></span>.__POWERED_BY_QIANKUN__ ? routerBase : process.env.BASE_URL,
+    <span class="hljs-attr"><span class="hljs-attr">mode</span></span>: <span class="hljs-string"><span class="hljs-string">'history'</span></span>,
+    routes
+  })
+  instance = <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> Vue({
+    router,
+    store,
+    <span class="hljs-attr"><span class="hljs-attr">render</span></span>: <span class="hljs-function"><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">h</span></span></span><span class="hljs-function">) =&gt;</span></span> h(App)
+  }).$mount(container ? container.querySelector(<span class="hljs-string"><span class="hljs-string">'#app'</span></span>) : <span class="hljs-string"><span class="hljs-string">'#app'</span></span>)
+}
+
+<span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (!<span class="hljs-built_in"><span class="hljs-built_in">window</span></span>.__POWERED_BY_QIANKUN__) {
+  render()
+}
+
+<span class="hljs-keyword"><span class="hljs-keyword">export</span></span> <span class="hljs-keyword"><span class="hljs-keyword">async</span></span> <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">bootstrap</span></span></span><span class="hljs-function"> (</span><span class="hljs-params"></span><span class="hljs-function"><span class="hljs-params"></span>) </span></span>{
+  <span class="hljs-built_in"><span class="hljs-built_in">console</span></span>.log(<span class="hljs-string"><span class="hljs-string">'[vue] vue app bootstraped'</span></span>)
+}
+
+<span class="hljs-keyword"><span class="hljs-keyword">export</span></span> <span class="hljs-keyword"><span class="hljs-keyword">async</span></span> <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">mount</span></span></span><span class="hljs-function"> (</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">props</span></span></span><span class="hljs-function">) </span></span>{
+  <span class="hljs-built_in"><span class="hljs-built_in">console</span></span>.log(<span class="hljs-string"><span class="hljs-string">'[vue] props from main framework'</span></span>, props)
+
+  render(props)
+}
+
+<span class="hljs-keyword"><span class="hljs-keyword">export</span></span> <span class="hljs-keyword"><span class="hljs-keyword">async</span></span> <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">unmount</span></span></span><span class="hljs-function"> (</span><span class="hljs-params"></span><span class="hljs-function"><span class="hljs-params"></span>) </span></span>{
+  instance.$destroy()
+  instance.$el.innerHTML = <span class="hljs-string"><span class="hljs-string">''</span></span>
+  instance = <span class="hljs-literal"><span class="hljs-literal">null</span></span>
+}</code></pre><p>至此，基础版本的vue子应用配置好了，如果<code>router</code>和<code>vuex</code>不需用到，可以去掉。</p><h3>二、react子应用</h3><ol><li>通过<code>npx create-react-app sub-react</code>新建一个react应用。</li><li>新增<code>.env</code>文件添加<code>PORT</code>变量，端口号与父应用配置的保持一致。</li><li>为了不<code>eject</code>所有webpack配置，我们用<a href="https://github.com/timarney/react-app-rewired">react-app-rewired</a>方案复写webpack就可以了。</li></ol><ul><li>首先<code>npm install react-app-rewired --save-dev</code></li><li>新建<code>sub-react/config-overrides.js</code></li></ul><pre><code class="lang-javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">const</span></span> { name } = <span class="hljs-built_in"><span class="hljs-built_in">require</span></span>(<span class="hljs-string"><span class="hljs-string">'./package.json'</span></span>);
+
+<span class="hljs-built_in"><span class="hljs-built_in">module</span></span>.exports = {
+  <span class="hljs-attr"><span class="hljs-attr">webpack</span></span>: <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">override</span></span></span><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">config, env</span></span></span><span class="hljs-function">) </span></span>{
+    <span class="hljs-comment"><span class="hljs-comment">// 解决主应用接入后会挂掉的问题：https://github.com/umijs/qiankun/issues/340</span></span>
+    config.entry = config.entry.filter(
+      <span class="hljs-function"><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">e</span></span></span><span class="hljs-function">) =&gt;</span></span> !e.includes(<span class="hljs-string"><span class="hljs-string">'webpackHotDevClient'</span></span>)
+    );
+    
+    config.output.library = <span class="hljs-string"><span class="hljs-string">`</span><span class="hljs-subst"><span class="hljs-string"><span class="hljs-subst">${name}</span></span></span><span class="hljs-string">-[name]`</span></span>;
+    config.output.libraryTarget = <span class="hljs-string"><span class="hljs-string">'umd'</span></span>;
+    config.output.jsonpFunction = <span class="hljs-string"><span class="hljs-string">`webpackJsonp_</span><span class="hljs-subst"><span class="hljs-string"><span class="hljs-subst">${name}</span></span></span><span class="hljs-string">`</span></span>;
+    <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> config;
+  },
+  <span class="hljs-attr"><span class="hljs-attr">devServer</span></span>: <span class="hljs-function"><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">configFunction</span></span></span><span class="hljs-function">) =&gt;</span></span> {
+    <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> (</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">proxy, allowedHost</span></span></span><span class="hljs-function">) </span></span>{
+      <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> config = configFunction(proxy, allowedHost);
+      config.open = <span class="hljs-literal"><span class="hljs-literal">false</span></span>;
+      config.hot = <span class="hljs-literal"><span class="hljs-literal">false</span></span>;
+      config.headers = {
+        <span class="hljs-string"><span class="hljs-string">'Access-Control-Allow-Origin'</span></span>: <span class="hljs-string"><span class="hljs-string">'*'</span></span>,
+      };
+      <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> config;
+    };
+  },
+};</code></pre><ol><li>新增<code>src/public-path.js</code>。</li></ol><pre><code class="lang-javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (<span class="hljs-built_in"><span class="hljs-built_in">window</span></span>.__POWERED_BY_QIANKUN__) {
+  <span class="hljs-comment"><span class="hljs-comment">// eslint-disable-next-line</span></span>
+  __webpack_public_path__ = <span class="hljs-built_in"><span class="hljs-built_in">window</span></span>.__INJECTED_PUBLIC_PATH_BY_QIANKUN__;
+}</code></pre><ol><li>改造<code>index.js</code>,引入<code>public-path.js</code>，添加生命周期函数等。</li></ol><pre><code class="lang-javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">import</span></span> <span class="hljs-string"><span class="hljs-string">'./public-path'</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> React <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'react'</span></span>;
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> ReactDOM <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'react-dom'</span></span>;
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> <span class="hljs-string"><span class="hljs-string">'./index.css'</span></span>;
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> App <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'./App'</span></span>;
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> * <span class="hljs-keyword"><span class="hljs-keyword">as</span></span> serviceWorker <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'./serviceWorker'</span></span>;
+
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">render</span></span></span><span class="hljs-function">(</span><span class="hljs-params"></span><span class="hljs-function"><span class="hljs-params"></span>) </span></span>{
+  ReactDOM.render(
+    <span class="xml"><span class="hljs-tag"><span class="xml"><span class="hljs-tag">&lt;</span></span><span class="hljs-name"><span class="xml"><span class="hljs-tag"><span class="hljs-name">App</span></span></span></span><span class="xml"><span class="hljs-tag"> /&gt;</span></span></span><span class="xml">,
+    document.getElementById('root')
+  );
+}
+
+if (!window.__POWERED_BY_QIANKUN__) {
+  render();
+}
+
+/**
+ * bootstrap 只会在微应用初始化的时候调用一次，下次微应用重新进入时会直接调用 mount 钩子，不会再重复触发 bootstrap。
+ * 通常我们可以在这里做一些全局变量的初始化，比如不会在 unmount 阶段被销毁的应用级别的缓存等。
+ */
+export async function bootstrap() {
+  console.log('react app bootstraped');
+}
+/**
+ * 应用每次进入都会调用 mount 方法，通常我们在这里触发应用的渲染方法
+ */
+export async function mount(props) {
+  console.log(props);
+  render();
+}
+/**
+ * 应用每次 切出/卸载 会调用的方法，通常在这里我们会卸载微应用的应用实例
+ */
+export async function unmount() {
+  ReactDOM.unmountComponentAtNode(document.getElementById('root'));
+}
+/**
+ * 可选生命周期钩子，仅使用 loadMicroApp 方式加载微应用时生效
+ */
+export async function update(props) {
+  console.log('update props', props);
+}
+
+serviceWorker.unregister();</span></span></code></pre><p>至此，基础版本的react子应用配置好了。</p><h2>进阶</h2><h3>全局状态管理</h3><p><code>qiankun</code>通过<a href="https://qiankun.umijs.org/zh/api#initglobalstatestate">initGlobalState, onGlobalStateChange, setGlobalState</a>实现主应用的全局状态管理，然后默认会通过<code>props</code>将通信方法传递给子应用。先看下官方的示例用法：</p><p>主应用：</p><pre><code class="lang-javascript hljs"><span class="hljs-comment"><span class="hljs-comment">// main/src/main.js</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> { initGlobalState } <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'qiankun'</span></span>;
+<span class="hljs-comment"><span class="hljs-comment">// 初始化 state</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">const</span></span> initialState = {
+  <span class="hljs-attr"><span class="hljs-attr">user</span></span>: {} <span class="hljs-comment"><span class="hljs-comment">// 用户信息</span></span>
+};
+<span class="hljs-keyword"><span class="hljs-keyword">const</span></span> actions = initGlobalState(initialState);
+actions.onGlobalStateChange(<span class="hljs-function"><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">state, prev</span></span></span><span class="hljs-function">) =&gt;</span></span> {
+  <span class="hljs-comment"><span class="hljs-comment">// state: 变更后的状态; prev 变更前的状态</span></span>
+  <span class="hljs-built_in"><span class="hljs-built_in">console</span></span>.log(state, prev);
+});
+actions.setGlobalState(state);
+actions.offGlobalStateChange();</code></pre><p>子应用：</p><pre><code class="lang-javascript hljs"><span class="hljs-comment"><span class="hljs-comment">// 从生命周期 mount 中获取通信方法，props默认会有onGlobalStateChange和setGlobalState两个api</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">export</span></span> <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">mount</span></span></span><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">props</span></span></span><span class="hljs-function">) </span></span>{
+  props.onGlobalStateChange(<span class="hljs-function"><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">state, prev</span></span></span><span class="hljs-function">) =&gt;</span></span> {
+    <span class="hljs-comment"><span class="hljs-comment">// state: 变更后的状态; prev 变更前的状态</span></span>
+    <span class="hljs-built_in"><span class="hljs-built_in">console</span></span>.log(state, prev);
+  });
+  props.setGlobalState(state);
+}</code></pre><p>这两段代码不难理解，父子应用通过<code>onGlobalStateChange</code>这个方法进行通信，这其实是一个发布-订阅的设计模式。</p><p>ok，官方的示例用法很简单也完全够用，纯JavaScript的语法，不涉及任何的vue或react的东西，开发者可自由定制。</p><p>如果我们直接使用官方的这个示例，那么数据会比较松散且调用复杂，所有子应用都得声明<code>onGlobalStateChange</code>对状态进行监听，再通过<code>setGlobalState</code>进行更新数据。</p><p>因此，我们很有必要<strong>对数据状态做进一步的封装设计</strong>。笔者这里主要考虑以下几点：</p><ul><li>主应用要保持简洁简单，对子应用来说，主应用下发的数据就是一个很纯粹的<code>object</code>，以便更好地支持不同框架的子应用，因此主应用不需用到<code>vuex</code>。</li><li>vue子应用要做到能继承父应用下发的数据，又支持独立运行。</li></ul><p>子应用在<code>mount</code>声明周期可以获取到最新的主应用下发的数据，然后将这份数据注册到一个名为<code>global</code>的vuex module中，子应用通过global module的action动作进行数据的更新，更新的同时自动同步回父应用。</p><p>因此，对子应用来说，<strong>它不用知道自己是一个qiankun子应用还是一个独立应用，它只是有一个名为<code>global</code>的module，它可通过action更新数据，且不再需要关心是否要同步到父应用</strong>（同步的动作会封装在方法内部，调用者不需关心），这也是为后面<strong>支持子应用独立启动开发做准备</strong>。</p><ul><li>react子应用同理（笔者react用得不深就不说了）。<br><img src="微前端qiankun从搭建到部署的实践/703287680.png" alt="微信图片_20200922235538.png" title="微信图片_20200922235538.png"></li></ul><h3>主应用的状态封装</h3><p>主应用维护一个<code>initialState</code>的初始数据，它是一个<code>object</code>类型，会下发给子应用。</p><pre><code class="lang-javascript hljs"><span class="hljs-comment"><span class="hljs-comment">// main/src/store.js</span></span>
+
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> { initGlobalState } <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'qiankun'</span></span>;
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> Vue <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'vue'</span></span>
+
+<span class="hljs-comment"><span class="hljs-comment">//父应用的初始state</span></span>
+<span class="hljs-comment"><span class="hljs-comment">// Vue.observable是为了让initialState变成可响应：https://cn.vuejs.org/v2/api/#Vue-observable。</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">let</span></span> initialState = Vue.observable({
+  <span class="hljs-attr"><span class="hljs-attr">user</span></span>: {},
+});
+
+<span class="hljs-keyword"><span class="hljs-keyword">const</span></span> actions = initGlobalState(initialState);
+
+actions.onGlobalStateChange(<span class="hljs-function"><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">newState, prev</span></span></span><span class="hljs-function">) =&gt;</span></span> {
+  <span class="hljs-comment"><span class="hljs-comment">// state: 变更后的状态; prev 变更前的状态</span></span>
+  <span class="hljs-built_in"><span class="hljs-built_in">console</span></span>.log(<span class="hljs-string"><span class="hljs-string">'main change'</span></span>, <span class="hljs-built_in"><span class="hljs-built_in">JSON</span></span>.stringify(newState), <span class="hljs-built_in"><span class="hljs-built_in">JSON</span></span>.stringify(prev));
+
+  <span class="hljs-keyword"><span class="hljs-keyword">for</span></span> (<span class="hljs-keyword"><span class="hljs-keyword">let</span></span> key <span class="hljs-keyword"><span class="hljs-keyword">in</span></span> newState) {
+    initialState[key] = newState[key]
+  }
+});
+
+<span class="hljs-comment"><span class="hljs-comment">// 定义一个获取state的方法下发到子应用</span></span>
+actions.getGlobalState = <span class="hljs-function"><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">key</span></span></span><span class="hljs-function">) =&gt;</span></span> {
+  <span class="hljs-comment"><span class="hljs-comment">// 有key，表示取globalState下的某个子级对象</span></span>
+  <span class="hljs-comment"><span class="hljs-comment">// 无key，表示取全部</span></span>
+  <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> key ? initialState[key] : initialState
+}
+
+<span class="hljs-keyword"><span class="hljs-keyword">export</span></span> <span class="hljs-keyword"><span class="hljs-keyword">default</span></span> actions;</code></pre><p>这里有两个注意的地方：</p><ul><li><code>Vue.observable</code>是为了让父应用的state变成可响应式，如果不用Vue.observable包一层，它就只是一个纯粹的object，子应用也能获取到，但会失去响应式，<strong>意味着数据改变后，页面不会更新</strong>。</li><li><code>getGlobalState</code>方法，这个是<strong>有争议</strong>的，大家在github上有讨论：<a href="https://github.com/umijs/qiankun/pull/729">https://github.com/umijs/qiankun/pull/729</a>。</li></ul><p>一方面，作者认为<code>getGlobalState</code>不是必须的，<code>onGlobalStateChange</code>其实已经够用。</p><p>另一方面，笔者和其他提pr的同学觉得有必要提供一个<code>getGlobalState</code>的api，理由是get方法更方便使用，子应用有需求是不需一直监听stateChange事件，它只需要在首次mount时通过getGlobalState初始化一次即可。在这里，笔者先坚持己见让父应用下发一个getGlobalState的方法。</p><p>由于官方还不支持getGlobalState，所以需要显示地在注册子应用时通过props去下发该方法：</p><pre><code class="lang-javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">import</span></span> store <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'./store'</span></span>;
+<span class="hljs-keyword"><span class="hljs-keyword">const</span></span> microApps = [
+  {
+    <span class="hljs-attr"><span class="hljs-attr">name</span></span>: <span class="hljs-string"><span class="hljs-string">'sub-vue'</span></span>,
+    <span class="hljs-attr"><span class="hljs-attr">entry</span></span>: <span class="hljs-string"><span class="hljs-string">'//localhost:7777/'</span></span>,
+    <span class="hljs-attr"><span class="hljs-attr">activeRule</span></span>: <span class="hljs-string"><span class="hljs-string">'/sub-vue'</span></span>,
+  },
+  {
+    <span class="hljs-attr"><span class="hljs-attr">name</span></span>: <span class="hljs-string"><span class="hljs-string">'sub-react'</span></span>,
+    <span class="hljs-attr"><span class="hljs-attr">entry</span></span>: <span class="hljs-string"><span class="hljs-string">'//localhost:7788/'</span></span>,
+    <span class="hljs-attr"><span class="hljs-attr">activeRule</span></span>: <span class="hljs-string"><span class="hljs-string">'/sub-react'</span></span>,
+  }
+]
+
+<span class="hljs-keyword"><span class="hljs-keyword">const</span></span> apps = microApps.map(<span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">item</span></span></span><span class="hljs-function"> =&gt;</span></span> {
+  <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> {
+    ...item,
+    <span class="hljs-attr"><span class="hljs-attr">container</span></span>: <span class="hljs-string"><span class="hljs-string">'#subapp-viewport'</span></span>, <span class="hljs-comment"><span class="hljs-comment">// 子应用挂载的div</span></span>
+    props: {
+      <span class="hljs-attr"><span class="hljs-attr">routerBase</span></span>: item.activeRule, <span class="hljs-comment"><span class="hljs-comment">// 下发基础路由</span></span>
+      getGlobalState: store.getGlobalState <span class="hljs-comment"><span class="hljs-comment">// 下发getGlobalState方法</span></span>
+    },
+  }
+})
+
+<span class="hljs-keyword"><span class="hljs-keyword">export</span></span> <span class="hljs-keyword"><span class="hljs-keyword">default</span></span> microApps</code></pre><h3>vue子应用的状态封装</h3><p>前面说了，子应用在mount时会将父应用下发的state，注册为一个叫<code>global</code>的vuex module，为了方便复用我们封装一下：</p><pre><code class="lang-javascript hljs"><span class="hljs-comment"><span class="hljs-comment">// sub-vue/src/store/global-register.js</span></span>
+
+<span class="hljs-comment"><span class="hljs-comment">/**
+ * 
+ * @param {vuex实例} store 
+ * @param {qiankun下发的props} props 
+ */</span></span>
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">registerGlobalModule</span></span></span><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">store, props = {}</span></span></span><span class="hljs-function">) </span></span>{
+  <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (!store || !store.hasModule) {
+    <span class="hljs-keyword"><span class="hljs-keyword">return</span></span>;
+  }
+
+  <span class="hljs-comment"><span class="hljs-comment">// 获取初始化的state</span></span>
+  <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> initState = props.getGlobalState &amp;&amp; props.getGlobalState() || {
+    <span class="hljs-attr"><span class="hljs-attr">menu</span></span>: [],
+    <span class="hljs-attr"><span class="hljs-attr">user</span></span>: {}
+  };
+
+  <span class="hljs-comment"><span class="hljs-comment">// 将父应用的数据存储到子应用中，命名空间固定为global</span></span>
+  <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (!store.hasModule(<span class="hljs-string"><span class="hljs-string">'global'</span></span>)) {
+    <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> globalModule = {
+      <span class="hljs-attr"><span class="hljs-attr">namespaced</span></span>: <span class="hljs-literal"><span class="hljs-literal">true</span></span>,
+      <span class="hljs-attr"><span class="hljs-attr">state</span></span>: initState,
+      <span class="hljs-attr"><span class="hljs-attr">actions</span></span>: {
+        <span class="hljs-comment"><span class="hljs-comment">// 子应用改变state并通知父应用</span></span>
+        setGlobalState({ commit }, payload) {
+          commit(<span class="hljs-string"><span class="hljs-string">'setGlobalState'</span></span>, payload);
+          commit(<span class="hljs-string"><span class="hljs-string">'emitGlobalState'</span></span>, payload);
+        },
+        <span class="hljs-comment"><span class="hljs-comment">// 初始化，只用于mount时同步父应用的数据</span></span>
+        initGlobalState({ commit }, payload) {
+          commit(<span class="hljs-string"><span class="hljs-string">'setGlobalState'</span></span>, payload);
+        },
+      },
+      <span class="hljs-attr"><span class="hljs-attr">mutations</span></span>: {
+        setGlobalState(state, payload) {
+          <span class="hljs-comment"><span class="hljs-comment">// eslint-disable-next-line</span></span>
+          state = <span class="hljs-built_in"><span class="hljs-built_in">Object</span></span>.assign(state, payload);
+        },
+        <span class="hljs-comment"><span class="hljs-comment">// 通知父应用</span></span>
+        emitGlobalState(state) {
+          <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (props.setGlobalState) {
+            props.setGlobalState(state);
+          }
+        },
+      },
+    };
+    store.registerModule(<span class="hljs-string"><span class="hljs-string">'global'</span></span>, globalModule);
+  } <span class="hljs-keyword"><span class="hljs-keyword">else</span></span> {
+    <span class="hljs-comment"><span class="hljs-comment">// 每次mount时，都同步一次父应用数据</span></span>
+    store.dispatch(<span class="hljs-string"><span class="hljs-string">'global/initGlobalState'</span></span>, initState);
+  }
+};
+
+<span class="hljs-keyword"><span class="hljs-keyword">export</span></span> <span class="hljs-keyword"><span class="hljs-keyword">default</span></span> registerGlobalModule;</code></pre><p><code>main.js</code>中添加global-module的使用：</p><pre><code class="lang-javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">import</span></span> globalRegister <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'./store/global-register'</span></span>
+
+<span class="hljs-keyword"><span class="hljs-keyword">export</span></span> <span class="hljs-keyword"><span class="hljs-keyword">async</span></span> <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">mount</span></span></span><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">props</span></span></span><span class="hljs-function">) </span></span>{
+  <span class="hljs-built_in"><span class="hljs-built_in">console</span></span>.log(<span class="hljs-string"><span class="hljs-string">'[vue] props from main framework'</span></span>, props)
+  globalRegister(store, props)
+  render(props)
+}</code></pre><p>可以看到，该vuex模块在子应用mount时，会调用<code>initGlobalState</code>将父应用下发的state初始化一遍，同时提供了<code>setGlobalState</code>方法供外部调用，内部自动通知同步到父应用。子应用在vue页面使用时如下：</p><pre><code class="lang-javascript hljs"><span class="hljs-keyword"><span class="hljs-keyword">export</span></span> <span class="hljs-keyword"><span class="hljs-keyword">default</span></span> {
+  <span class="hljs-attr"><span class="hljs-attr">computed</span></span>: {
+    ...mapState(<span class="hljs-string"><span class="hljs-string">'global'</span></span>, {
+      <span class="hljs-attr"><span class="hljs-attr">user</span></span>: <span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">state</span></span></span><span class="hljs-function"> =&gt;</span></span> state.user, <span class="hljs-comment"><span class="hljs-comment">// 获取父应用的user信息</span></span>
+    }),
+  },
+  <span class="hljs-attr"><span class="hljs-attr">methods</span></span>: {
+    ...mapActions(<span class="hljs-string"><span class="hljs-string">'global'</span></span>, [<span class="hljs-string"><span class="hljs-string">'setGlobalState'</span></span>]),
+    update () {
+        <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.setGlobalState(<span class="hljs-string"><span class="hljs-string">'user'</span></span>, { <span class="hljs-attr"><span class="hljs-attr">name</span></span>: <span class="hljs-string"><span class="hljs-string">'张三'</span></span> })
+    }
+  },
+};</code></pre><p>这样就达到了一个效果：子应用不用知道qiankun的存在，它只知道有这么一个global module可以存储信息，父子之间的通信都封装在方法本身了，它只关心本身的信息存储就可以了。</p><blockquote><p>ps: 该方案也是有缺点的，由于子应用是在mount时才会同步父应用下发的state的。因此，它只适合每次只mount一个子应用的架构（不适合多个子应用共存）；若父应用数据有变化而子应用又没触发mount，则父应用最新的数据无法同步回子应用。想要做到多子应用共存且父动态传子，子应用还是需要用到qiankun提供的<code>onGlobalStateChange</code>的api监听才行，有更好方案的同学可以分享讨论一下。该方案刚好符合笔者当前的项目需求，因此够用了，请同学们根据自己的业务需求来封装。</p></blockquote><h3>子应用切换Loading处理</h3><p>子应用首次加载时相当于新加载一个项目，还是比较慢的，因此loading是不得不加上的。</p><p><a href="https://github.com/umijs/qiankun/blob/master/examples/main/render/VueRender.js">官方的例子</a>中有做了loading的处理,但是需要额外引入<code>import Vue from 'vue/dist/vue.esm'</code>，这会增加主应用的打包体积（对比发现大概增加了100KB）。一个loading增加了100K，显然代价有点无法接受，所以需要考虑一种更优一点的办法。</p><p>我们的主应用是用vue搭建的，而且qiankun提供了<a href="https://qiankun.umijs.org/zh/api#registermicroappsapps-lifecycles">loader</a>方法可以获取到子应用的加载状态，所以自然而然地可以想到：<strong>在<code>main.js</code>中子应用加载时，将loading 的状态传给Vue实例，让Vue实例响应式地显示loading。</strong>接下来先选一个loading组件：</p><ul><li>如果主应用使用了ElementUI或其他框架，可以直接使用UI库提供的loading组件。</li><li>如果主应用为了保持简单没有引入UI库，可以考虑自己写一个loading组件，或者找个小巧的loading库，如笔者这里要用到的<a href="https://github.com/rstacruz/nprogress">NProgress</a>。</li></ul><pre><code class="hljs sql">npm <span class="hljs-keyword"><span class="hljs-keyword">install</span></span> <span class="hljs-comment"><span class="hljs-comment">--save nprogress</span></span></code></pre><p>接下来是想办法如何把loading状态传给主应用的<code>App.vue</code>。经过笔者试验发现，<code>new Vue</code>方法返回的vue实例可以通过<code>instance.$children[0]</code>来改变<code>App.vue</code>的数据，所以改造一下<code>main.js</code>：</p><pre><code class="lang-javascript hljs"><span class="hljs-comment"><span class="hljs-comment">// 引入nprogress的css</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> <span class="hljs-string"><span class="hljs-string">'nprogress/nprogress.css'</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> microApps <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'./micro-app'</span></span>;
+
+<span class="hljs-comment"><span class="hljs-comment">// 获取实例</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">const</span></span> instance = <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> Vue({
+  <span class="hljs-attr"><span class="hljs-attr">render</span></span>: <span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">h</span></span></span><span class="hljs-function"> =&gt;</span></span> h(App),
+}).$mount(<span class="hljs-string"><span class="hljs-string">'#app'</span></span>);
+
+<span class="hljs-comment"><span class="hljs-comment">// 定义loader方法，loading改变时，将变量赋值给App.vue的data中的isLoading</span></span>
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">loader</span></span></span><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">loading</span></span></span><span class="hljs-function">) </span></span>{
+  <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (instance &amp;&amp; instance.$children) {
+    <span class="hljs-comment"><span class="hljs-comment">// instance.$children[0] 是App.vue，此时直接改动App.vue的isLoading</span></span>
+    instance.$children[<span class="hljs-number"><span class="hljs-number">0</span></span>].isLoading = loading
+  }
+}
+
+<span class="hljs-comment"><span class="hljs-comment">// 给子应用配置加上loader方法</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">let</span></span> apps = microApps.map(<span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">item</span></span></span><span class="hljs-function"> =&gt;</span></span> {
+  <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> {
+    ...item,
+    loader
+  }
+})
+registerMicroApps(apps);
+
+start();</code></pre><blockquote><p>PS: qiankun的registerMicroApps方法也监听到子应用的beforeLoad、afterMount等生命周期，因此也可以使用这些方法记录loading状态，但更好的用法肯定是通过loader参数传递。</p></blockquote><p>改造主应用的App.vue，通过watch监听<code>isLoading</code></p><pre><code class="lang-html hljs xml"><span class="hljs-tag"><span class="hljs-tag">&lt;</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">template</span></span></span><span class="hljs-tag">&gt;</span></span>
+  <span class="hljs-tag"><span class="hljs-tag">&lt;</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">div</span></span></span><span class="hljs-tag"> </span><span class="hljs-attr"><span class="hljs-tag"><span class="hljs-attr">id</span></span></span><span class="hljs-tag">=</span><span class="hljs-string"><span class="hljs-tag"><span class="hljs-string">"layout-wrapper"</span></span></span><span class="hljs-tag">&gt;</span></span>
+    <span class="hljs-tag"><span class="hljs-tag">&lt;</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">div</span></span></span><span class="hljs-tag"> </span><span class="hljs-attr"><span class="hljs-tag"><span class="hljs-attr">class</span></span></span><span class="hljs-tag">=</span><span class="hljs-string"><span class="hljs-tag"><span class="hljs-string">"layout-header"</span></span></span><span class="hljs-tag">&gt;</span></span>头部导航<span class="hljs-tag"><span class="hljs-tag">&lt;/</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">div</span></span></span><span class="hljs-tag">&gt;</span></span>
+    <span class="hljs-tag"><span class="hljs-tag">&lt;</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">div</span></span></span><span class="hljs-tag"> </span><span class="hljs-attr"><span class="hljs-tag"><span class="hljs-attr">id</span></span></span><span class="hljs-tag">=</span><span class="hljs-string"><span class="hljs-tag"><span class="hljs-string">"subapp-viewport"</span></span></span><span class="hljs-tag">&gt;</span></span><span class="hljs-tag"><span class="hljs-tag">&lt;/</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">div</span></span></span><span class="hljs-tag">&gt;</span></span>
+  <span class="hljs-tag"><span class="hljs-tag">&lt;/</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">div</span></span></span><span class="hljs-tag">&gt;</span></span>
+<span class="hljs-tag"><span class="hljs-tag">&lt;/</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">template</span></span></span><span class="hljs-tag">&gt;</span></span>
+
+<span class="hljs-tag"><span class="hljs-tag">&lt;</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">script</span></span></span><span class="hljs-tag">&gt;</span></span><span class="javascript"><span class="javascript">
+</span><span class="hljs-keyword"><span class="javascript"><span class="hljs-keyword">import</span></span></span><span class="javascript"> NProgress </span><span class="hljs-keyword"><span class="javascript"><span class="hljs-keyword">from</span></span></span><span class="javascript"> </span><span class="hljs-string"><span class="javascript"><span class="hljs-string">'nprogress'</span></span></span><span class="javascript">
+</span><span class="hljs-keyword"><span class="javascript"><span class="hljs-keyword">export</span></span></span><span class="javascript"> </span><span class="hljs-keyword"><span class="javascript"><span class="hljs-keyword">default</span></span></span><span class="javascript"> {
+  </span><span class="hljs-attr"><span class="javascript"><span class="hljs-attr">name</span></span></span><span class="javascript">: </span><span class="hljs-string"><span class="javascript"><span class="hljs-string">'App'</span></span></span><span class="javascript">,
+  data () {
+    </span><span class="hljs-keyword"><span class="javascript"><span class="hljs-keyword">return</span></span></span><span class="javascript"> {
+      </span><span class="hljs-attr"><span class="javascript"><span class="hljs-attr">isLoading</span></span></span><span class="javascript">: </span><span class="hljs-literal"><span class="javascript"><span class="hljs-literal">true</span></span></span><span class="javascript">
+    }
+  },
+  </span><span class="hljs-attr"><span class="javascript"><span class="hljs-attr">watch</span></span></span><span class="javascript">: {
+    isLoading (val) {
+      </span><span class="hljs-keyword"><span class="javascript"><span class="hljs-keyword">if</span></span></span><span class="javascript"> (val) {
+        NProgress.start()
+      } </span><span class="hljs-keyword"><span class="javascript"><span class="hljs-keyword">else</span></span></span><span class="javascript"> {
+        </span><span class="hljs-keyword"><span class="javascript"><span class="hljs-keyword">this</span></span></span><span class="javascript">.$nextTick(</span><span class="hljs-function"><span class="hljs-params"><span class="javascript"><span class="hljs-function"><span class="hljs-params">()</span></span></span></span><span class="javascript"><span class="hljs-function"> =&gt;</span></span></span><span class="javascript"> {
+          NProgress.done()
+        })
+      }
+    }
+  },
+  </span><span class="hljs-attr"><span class="javascript"><span class="hljs-attr">components</span></span></span><span class="javascript">: {},
+  created () {
+    NProgress.start()
+  }
+}
+</span></span><span class="hljs-tag"><span class="hljs-tag">&lt;/</span><span class="hljs-name"><span class="hljs-tag"><span class="hljs-name">script</span></span></span><span class="hljs-tag">&gt;</span></span></code></pre><p>至此，loading效果就实现了。虽然<code>instance.$children[0].isLoading</code>的操作看起来比较骚，但确实比官方的提供的例子成本小很多(体积增加几乎为0)，若有更好的办法，欢迎大家评论区分享。</p><h3>抽取公共代码</h3><p>不可避免，有些方法或工具类是所有子应用都需要用到的，每个子应用都copy一份肯定是不好维护的，所以抽取公共代码到一处是必要的一步。</p><p>根目录下新建一个<code>common</code>文件夹用于存放公共代码，如上面的多个vue子应用都可以共用的<code>global-register.js</code>，或者是可复用的<code>request.js</code>和<code>sdk</code>之类的工具函数等。这里代码不贴了，请直接看<a href="https://github.com/fengxianqi/qiankun-example/tree/master/common">demo</a>。</p><p>公共代码抽取后，其他的应用如何使用呢？ 可以让common发布为一个npm私包，npm私包有以下几种组织形式：</p><ul><li>npm指向本地file地址：<code>npm install file:../common</code>。直接在根目录新建一个common目录，然后npm直接依赖文件路径。</li><li>npm指向私有git仓库: <code>npm install git+ssh://xxx-common.git</code>。</li><li>发布到npm私服。</li></ul><p>本demo因为是基座和子应用都集合在一个git仓库上，所以采用了第一种方式，但实际应用时是发布到npm私服，因为后面我们会拆分基座和子应用为独立的子仓库，支持独立开发，后文会讲到。</p><p>需要注意的是，由于common是不经过babel和pollfy的，所以引用者需要在webpack打包时显性指定该模块需要编译，如vue子应用的vue.config.js需要加上这句：</p><pre><code class="lang-javascript hljs"><span class="hljs-built_in"><span class="hljs-built_in">module</span></span>.exports = {
+  <span class="hljs-attr"><span class="hljs-attr">transpileDependencies</span></span>: [<span class="hljs-string"><span class="hljs-string">'common'</span></span>],
+}</code></pre><h3>子应用支持独立开发</h3><p>微前端一个很重要的概念是拆分，是分治的思想，把所有的业务拆分为一个个独立可运行的模块。</p><p>从开发者的角度看，整个系统可能有N个子应用，如果启动整个系统可能会很慢很卡，而产品的某个需求可能只涉及到其中一个子应用，因此开发时只需启动涉及到的子应用即可，独立启动专注开发，因此是很有必要支持子应用的独立开发的。如果要支持，主要会遇到以下几个问题：</p><ul><li><strong>子应用的登录态怎么维护？</strong></li><li><strong>基座不启动时，怎么获取到基座下发的数据和能力？</strong></li></ul><p>在基座运行时，登录态和用户信息是存放在基座上的，然后基座通过props下发给子应用。但如果基座不启动，只是子应用独立启动，子应用就没法通过props获取到所需的用户信息了。因此，解决办法只能是父子应用都得实现一套相同的登录逻辑。为了可复用，可以把登录逻辑封装在common中，然后在子应用独立运行的逻辑中添加登录相关的逻辑。</p><pre><code class="lang-javascript hljs"><span class="hljs-comment"><span class="hljs-comment">// sub-vue/src/main.js</span></span>
+
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> { store <span class="hljs-keyword"><span class="hljs-keyword">as</span></span> commonStore } <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'common'</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">import</span></span> store <span class="hljs-keyword"><span class="hljs-keyword">from</span></span> <span class="hljs-string"><span class="hljs-string">'./store'</span></span>
+
+<span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (!<span class="hljs-built_in"><span class="hljs-built_in">window</span></span>.__POWERED_BY_QIANKUN__) {
+  <span class="hljs-comment"><span class="hljs-comment">// 这里是子应用独立运行的环境，实现子应用的登录逻辑</span></span>
+  
+  <span class="hljs-comment"><span class="hljs-comment">// 独立运行时，也注册一个名为global的store module</span></span>
+  commonStore.globalRegister(store)
+  <span class="hljs-comment"><span class="hljs-comment">// 模拟登录后，存储用户信息到global module</span></span>
+  <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> userInfo = { <span class="hljs-attr"><span class="hljs-attr">name</span></span>: <span class="hljs-string"><span class="hljs-string">'我是独立运行时名字叫张三'</span></span> } <span class="hljs-comment"><span class="hljs-comment">// 假设登录后取到的用户信息</span></span>
+  store.commit(<span class="hljs-string"><span class="hljs-string">'global/setGlobalState'</span></span>, { <span class="hljs-attr"><span class="hljs-attr">user</span></span>: userInfo })
+  
+  render()
+}
+<span class="hljs-comment"><span class="hljs-comment">// ...</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">export</span></span> <span class="hljs-keyword"><span class="hljs-keyword">async</span></span> <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">mount</span></span></span><span class="hljs-function"> (</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">props</span></span></span><span class="hljs-function">) </span></span>{
+  <span class="hljs-built_in"><span class="hljs-built_in">console</span></span>.log(<span class="hljs-string"><span class="hljs-string">'[vue] props from main framework'</span></span>, props)
+
+  commonStore.globalRegister(store, props)
+
+  render(props)
+}
+<span class="hljs-comment"><span class="hljs-comment">// ...</span></span></code></pre><p><code>!window.__POWERED_BY_QIANKUN__</code>表示子应用处于非<code>qiankun</code>内的环境，即独立运行时。此时我们依然要注册一个名为<code>global</code>的vuex module，子应用内部同样可以从global module中获取用户的信息，从而做到抹平qiankun和独立运行时的环境差异。</p><blockquote><p>PS：我们前面写的<code>global-register.js</code>写得很巧妙，能够同时支持两种环境，因此上面可以通过<code>commonStore.globalRegister</code>直接引用。</p></blockquote><h3>子应用独立仓库</h3><p>随着项目发展，子应用可能会越来越多，如果子应用和基座都集合在同一个git仓库，就会越来越臃肿。</p><p>若项目有CI/CD，只修改了某个子应用的代码，但代码提交会同时触发所有子应用构建，牵一发动全身，是不合理的。</p><p>同时，如果某些业务的子应用的开发是跨部门跨团队的，代码仓库如何分权限管理又是一个问题。</p><p>基于以上问题，我们不得不考虑将各个应用迁移到独立的git仓库。由于我们独立仓库了，项目可能不会再放到同一个目录下，因此前面通过<code>npm i file:../common</code>方式安装的common就不适用了，所以最好还是发布到公司的npm私服或采用git地址形式。</p><blockquote><p><code>qiankun-example</code>为了更好展示，仍将所有应用都放在同一个git仓库下，请各位同学不要照抄。</p></blockquote><h3>子应用独立仓库后聚合管理</h3><p>子应用独立git仓库后，可以做到独立启动独立开发了，这时候又会遇到问题：<strong>开发环境都是独立的，无法一览整个应用的全貌</strong>。</p><p>虽然开发时专注于某个子应用时更好，但总有需要整个项目跑起来的时候，比如当多个子应用需要互相依赖跳转时，所以还是要有一个整个项目对所有子应用git仓库的聚合管理才行，该聚合仓库要求做到能够一键install所有的依赖(包括子应用)，一键启动整个项目。</p><p>这里主要考虑了三种方案：</p><ol><li>使用<code>git submodule</code>。</li><li>使用<code>git subtree</code>。</li><li>单纯地将所有子仓库放到聚合目录下并<code>.gitignore</code>掉。</li><li>使用lerna管理。</li></ol><p><code>git submodule</code>和<code>git subtree</code>都是很好的子仓库管理方案，但缺点是每次子应用变更后，聚合库还得同步一次变更。</p><p>考虑到并不是所有人都会使用该聚合仓库，子仓库独立开发时往往不会主动同步到聚合库，使用聚合库的同学就得经常做同步的操作，比较耗时耗力，不算特别完美。</p><p>所以第三种方案比较符合笔者目前团队的情况。聚合库相当于是一个空目录，在该目录下clone所有子仓库，并<code>gitignore</code>，子仓库的代码提交都在各自的仓库目录下进行操作，这样聚合库可以避免做同步的操作。</p><p>由于ignore了所有子仓库，聚合库clone下来后，仍是一个空目录，此时我们可以写个脚本<code>scripts/clone-all.sh</code>，把所有子仓库的clone命令都写上：</p><pre><code class="lang-bash hljs"><span class="hljs-comment"><span class="hljs-comment"># 子仓库一</span></span>
+git <span class="hljs-built_in"><span class="hljs-built_in">clone</span></span> git@xxx1.git
+
+<span class="hljs-comment"><span class="hljs-comment"># 子仓库二</span></span>
+git <span class="hljs-built_in"><span class="hljs-built_in">clone</span></span> git@xxx2.git</code></pre><p>然后在聚合库也初始化一个<code>package.json</code>，scripts加上:</p><pre><code class="lang-javascript hljs">  <span class="hljs-string"><span class="hljs-string">"scripts"</span></span>: {
+    <span class="hljs-string"><span class="hljs-string">"clone:all"</span></span>: <span class="hljs-string"><span class="hljs-string">"bash ./scripts/clone-all.sh"</span></span>,
+  },</code></pre><p>这样，git clone聚合库下来后，再<code>npm run clone:all</code>就可以做到一键clone所有子仓库了。</p><p>前面说到聚合库要能够做到一键install和一键启动整个项目，我们参考qiankun的examples，使用<a href="https://www.npmjs.com/package/npm-run-all">npm-run-all</a>来做这个事情。</p><ol><li>聚合库安装<code>npm i npm-run-all -D</code>。</li><li>聚合库的package.json增加install和start命令：</li></ol><pre><code class="lang-javascript hljs">  <span class="hljs-string"><span class="hljs-string">"scripts"</span></span>: {
+    ...
+    <span class="hljs-string"><span class="hljs-string">"install"</span></span>: <span class="hljs-string"><span class="hljs-string">"npm-run-all --serial install:*"</span></span>,
+    <span class="hljs-string"><span class="hljs-string">"install:main"</span></span>: <span class="hljs-string"><span class="hljs-string">"cd main &amp;&amp; npm i"</span></span>,
+    <span class="hljs-string"><span class="hljs-string">"install:sub-vue"</span></span>: <span class="hljs-string"><span class="hljs-string">"cd sub-vue &amp;&amp; npm i"</span></span>,
+    <span class="hljs-string"><span class="hljs-string">"install:sub-react"</span></span>: <span class="hljs-string"><span class="hljs-string">"cd sub-react &amp;&amp; npm i"</span></span>,
+    <span class="hljs-string"><span class="hljs-string">"start"</span></span>: <span class="hljs-string"><span class="hljs-string">"npm-run-all --parallel start:*"</span></span>,
+    <span class="hljs-string"><span class="hljs-string">"start:sub-react"</span></span>: <span class="hljs-string"><span class="hljs-string">"cd sub-react &amp;&amp; npm start"</span></span>,
+    <span class="hljs-string"><span class="hljs-string">"start:sub-vue"</span></span>: <span class="hljs-string"><span class="hljs-string">"cd sub-vue &amp;&amp; npm start"</span></span>,
+    <span class="hljs-string"><span class="hljs-string">"start:main"</span></span>: <span class="hljs-string"><span class="hljs-string">"cd main &amp;&amp; npm start"</span></span>
+  },</code></pre><blockquote><p><code>npm-run-all</code>的<code>--serial</code>表示有顺序地一个个执行，<code>--parallel</code>表示同时并行地运行。</p></blockquote><p>配好以上，一键安装<code>npm i</code>,一键启动<code>npm start</code>。</p><h4>vscode eslint配置</h4><p>如果使用vscode，且使用了eslint的插件做自动修复，由于项目处于非根目录，eslint没法生效，所以还需要指定eslint的工作目录：</p><pre><code class="lang-javascript hljs"><span class="hljs-comment"><span class="hljs-comment">// .vscode/settings.json</span></span>
+{
+  <span class="hljs-string"><span class="hljs-string">"eslint.workingDirectories"</span></span>: [
+    <span class="hljs-string"><span class="hljs-string">"./main"</span></span>,
+    <span class="hljs-string"><span class="hljs-string">"./sub-vue"</span></span>,
+    <span class="hljs-string"><span class="hljs-string">"./sub-react"</span></span>,
+    <span class="hljs-string"><span class="hljs-string">"./common"</span></span>
+  ],
+  <span class="hljs-string"><span class="hljs-string">"eslint.enable"</span></span>: <span class="hljs-literal"><span class="hljs-literal">true</span></span>,
+  <span class="hljs-string"><span class="hljs-string">"editor.formatOnSave"</span></span>: <span class="hljs-literal"><span class="hljs-literal">false</span></span>,
+  <span class="hljs-string"><span class="hljs-string">"editor.codeActionsOnSave"</span></span>: {
+    <span class="hljs-string"><span class="hljs-string">"source.fixAll.eslint"</span></span>: <span class="hljs-literal"><span class="hljs-literal">true</span></span>
+  },
+  <span class="hljs-string"><span class="hljs-string">"search.useIgnoreFiles"</span></span>: <span class="hljs-literal"><span class="hljs-literal">false</span></span>,
+  <span class="hljs-string"><span class="hljs-string">"search.exclude"</span></span>: {
+    <span class="hljs-string"><span class="hljs-string">"**/dist"</span></span>: <span class="hljs-literal"><span class="hljs-literal">true</span></span>
+  },
+}
+</code></pre><h3>子应用互相跳转</h3><p>除了点击页面顶部的菜单切换子应用，我们的需求也要求子应用内部跳其他子应用，这会涉及到顶部菜单active状态的展示问题:<code>sub-vue</code>切换到<code>sub-react</code>，此时顶部菜单需要将<code>sub-react</code>改为激活状态。有两种方案：</p><ul><li>子应用跳转动作向上抛给父应用，由父应用做真正的跳转，从而父应用知道要改变激活状态，有点子组件<code>$emit</code>事件给父组件的意思。</li><li>父应用监听<code>history.pushState</code>事件，当发现路由换了，父应用从而知道要不要改变激活状态。</li></ul><p>由于<code>qiankun</code>暂时没有封装子应用向父应用抛出事件的api，如iframe的<code>postMessage</code>，所以方案一有些难度，不过可以将激活状态放到状态管理中，子应用通过改变vuex中的值让父应用同步就行，做法可行但不太好，维护状态在状态管理中有点复杂了。</p><p>所以我们这里选方案二，子应用跳转是通过<code>history.pushState(null, '/sub-react', '/sub-react')</code>的，因此父应用在mounted时想办法监听到<code>history.pushState</code>就可以了。由于<code>history.popstate</code>只能监听<code>back/forward/go</code>却不能监听<code>history.pushState</code>，所以需要额外全局复写一下<code>history.pushState</code>事件。</p><pre><code class="lang-javascript hljs"><span class="hljs-comment"><span class="hljs-comment">// main/src/App.vue</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">export</span></span> <span class="hljs-keyword"><span class="hljs-keyword">default</span></span> {
+  <span class="hljs-attr"><span class="hljs-attr">methods</span></span>: {
+    bindCurrent () {
+      <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> path = <span class="hljs-built_in"><span class="hljs-built_in">window</span></span>.location.pathname
+      <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (<span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.microApps.findIndex(<span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">item</span></span></span><span class="hljs-function"> =&gt;</span></span> item.activeRule === path) &gt;= <span class="hljs-number"><span class="hljs-number">0</span></span>) {
+        <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.current = path
+      }
+    },
+    listenRouterChange () {
+      <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> _wr = <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> (</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">type</span></span></span><span class="hljs-function">) </span></span>{
+        <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> orig = history[type]
+        <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> (</span><span class="hljs-params"></span><span class="hljs-function"><span class="hljs-params"></span>) </span></span>{
+          <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> rv = orig.apply(<span class="hljs-keyword"><span class="hljs-keyword">this</span></span>, <span class="hljs-built_in"><span class="hljs-built_in">arguments</span></span>)
+          <span class="hljs-keyword"><span class="hljs-keyword">const</span></span> e = <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> Event(type)
+          e.arguments = <span class="hljs-built_in"><span class="hljs-built_in">arguments</span></span>
+          <span class="hljs-built_in"><span class="hljs-built_in">window</span></span>.dispatchEvent(e)
+          <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> rv
+        }
+      }
+      history.pushState = _wr(<span class="hljs-string"><span class="hljs-string">'pushState'</span></span>)
+
+      <span class="hljs-built_in"><span class="hljs-built_in">window</span></span>.addEventListener(<span class="hljs-string"><span class="hljs-string">'pushState'</span></span>, <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.bindCurrent)
+      <span class="hljs-built_in"><span class="hljs-built_in">window</span></span>.addEventListener(<span class="hljs-string"><span class="hljs-string">'popstate'</span></span>, <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.bindCurrent)
+
+      <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.$once(<span class="hljs-string"><span class="hljs-string">'hook:beforeDestroy'</span></span>, () =&gt; {
+        <span class="hljs-built_in"><span class="hljs-built_in">window</span></span>.removeEventListener(<span class="hljs-string"><span class="hljs-string">'pushState'</span></span>, <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.bindCurrent)
+        <span class="hljs-built_in"><span class="hljs-built_in">window</span></span>.removeEventListener(<span class="hljs-string"><span class="hljs-string">'popstate'</span></span>, <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.bindCurrent)
+      })
+    }
+  },
+  mounted () {
+    <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.listenRouterChange()
+  }
+}</code></pre><h2>性能优化</h2><p>每个子应用都是一个完整的应用，每个vue子应用都打包了一份<code>vue/vue-router/vuex</code>。从整个项目的角度，相当于将那些模块打包了多次，会很浪费，所以这里可以进一步去优化性能。</p><p>首先我们能想到的是通过webpack的<code>externals</code>或主应用下发公共模块进行复用。</p><p>但是要注意，如果所有子应用都共用一个相同的模块，从长远来看，不利于子应用的升级，难以两全其美。</p><p>现在觉得比较好的做法是：主应用可以下发一些自身用到的模块，子应用可以优先选择主应用下发的模块，当发现主应用没有时则自己加载；子应用也可以直接使用最新的版本而不用父应用下发的。</p><p>这个方案参考自<a href="https://juejin.im/post/6844904185910018062#heading-18">qiankun 微前端方案实践及总结-子项目之间的公共插件如何共享</a>，思路说得非常完整，大家可以看看，本项目暂时还没加上该功能。</p><h2>部署</h2><p>现在网上qiankun部署相关的文章几乎搜不到，可能是觉得简单没啥好说的吧。但对于还不太熟悉的同学来说，其实会比较纠结qiankun部署的最佳部署方案是怎样的呢？所以觉得很有必要讲一下笔者这里的部署方案，供大家参考。</p><p>方案如下：</p><p>考虑到主应用和子应用共用域名时可能会存在路由冲突的问题，子应用可能会源源不断地添加进来，因此我们将子应用都放在<code>xx.com/subapp/</code>这个二级目录下，根路径<code>/</code>留给主应用。</p><p>步骤如下：</p><ol><li>主应用main和所有子应用都打包出一份html,css,js,static，分目录上传到服务器，子应用统一放到<code>subapp</code>目录下，最终如：</li></ol><pre><code class="lang-bash hljs">├── main
+│&nbsp;&nbsp; └── index.html
+└── subapp
+    ├── sub-react
+    │&nbsp;&nbsp; └── index.html
+    └── sub-vue
+        └── index.html</code></pre><ol><li>配置nginx，预期是<code>xx.com</code>根路径指向主应用，<code>xx.com/subapp</code>指向子应用,子应用的配置只需写一份，以后新增子应用也不需要改nginx配置，以下应该是微应用部署的最简洁的一份nginx配置了。</li></ol><pre><code class="lang-bash hljs">server {
+    listen       80;
+    server_name qiankun.fengxianqi.com;
+    location / {
+        root   /data/web/qiankun/main;  <span class="hljs-comment"><span class="hljs-comment"># 主应用所在的目录</span></span>
+        index index.html;
+        try_files <span class="hljs-variable"><span class="hljs-variable">$uri</span></span> <span class="hljs-variable"><span class="hljs-variable">$uri</span></span>/ /index.html;
+    }
+    location /subapp {
+        <span class="hljs-built_in"><span class="hljs-built_in">alias</span></span> /data/web/qiankun/subapp;
+        try_files <span class="hljs-variable"><span class="hljs-variable">$uri</span></span> <span class="hljs-variable"><span class="hljs-variable">$uri</span></span>/ /index.html;
+    }
+
+}</code></pre><p><code>nginx -s reload</code>后就可以了。</p><p>本文特地做了线上demo展示：</p><p>整站（主应用）：<a href="http://qiankun.fengxianqi.com/">http://qiankun.fengxianqi.com/</a></p><p>单独访问子应用：</p><ul><li><a href="http://qiankun.fengxianqi.com/subapp/sub-vue/">subapp/sub-vue</a>, 注意观察vuex数据的变化。</li><li><a href="http://qiankun.fengxianqi.com/subapp/sub-react/">subapp/sub-react</a></li></ul><h2>遇到的问题</h2><h3>一、react子应用启动后，主应用第一次渲染后会挂掉</h3><p><img src="微前端qiankun从搭建到部署的实践/62658819.png" alt="2891379385-21efd2843a210e73_articlex.png" title="2891379385-21efd2843a210e73_articlex.png"><br>子应用的热重载居然会引得父应用直接挂掉，当时完全懵逼了。还好搜到了相关的<a href="https://github.com/umijs/qiankun/issues/340">issues/340</a>,即在复写react的webpack时禁用掉热重载（加了下面配置禁用后会导致没法热重载，react应用在开发时得手动刷新了，是不是有点难受。。。）：</p><pre><code class="hljs javascript"><span class="hljs-built_in"><span class="hljs-built_in">module</span></span>.exports = {
+  <span class="hljs-attr"><span class="hljs-attr">webpack</span></span>: <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">function</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">override</span></span></span><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">config, env</span></span></span><span class="hljs-function">) </span></span>{
+    <span class="hljs-comment"><span class="hljs-comment">// 解决主应用接入后会挂掉的问题：https://github.com/umijs/qiankun/issues/340</span></span>
+    config.entry = config.entry.filter(
+      <span class="hljs-function"><span class="hljs-function">(</span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">e</span></span></span><span class="hljs-function">) =&gt;</span></span> !e.includes(<span class="hljs-string"><span class="hljs-string">'webpackHotDevClient'</span></span>)
+    );
+    <span class="hljs-comment"><span class="hljs-comment">// ...</span></span>
+    <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> config;
+  }
+};</code></pre><h3>二、Uncaught Error: application 'xx' died in status SKIP_BECAUSE_BROKEN: [qiankun] Target container with #subapp-viewport not existed while xx mounting!</h3><p>在本地dev开发时是完全正常的，这个问题是部署后在首次打开页面才会出现的，F5刷新后又会正常，只能在清掉缓存后复现一次。这个bug困扰了几天。</p><p>错误信息很清晰，即主应用在挂载xx子应用时，用于装载子应用的dom不存在。所以一开始以为是vue做主应用时，<code>#subapp-viewport</code>还没来得及渲染，因此要尝试确保主应用<code>mount</code>后再注册子应用。</p><pre><code class="hljs javascript"><span class="hljs-comment"><span class="hljs-comment">// 主应用的main.js</span></span>
+<span class="hljs-keyword"><span class="hljs-keyword">new</span></span> Vue({
+  <span class="hljs-attr"><span class="hljs-attr">render</span></span>: <span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">h</span></span></span><span class="hljs-function"> =&gt;</span></span> h(App),
+  <span class="hljs-attr"><span class="hljs-attr">mounted</span></span>: <span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">()</span></span></span><span class="hljs-function"> =&gt;</span></span> {
+    <span class="hljs-comment"><span class="hljs-comment">// mounted后再注册子应用</span></span>
+    renderMicroApps();
+  },
+}).$mount(<span class="hljs-string"><span class="hljs-string">'#root-app'</span></span>);</code></pre><p>但该办法不行，甚至setTimeout都用上了也不行，需另想办法。</p><p>最后逐步调试发现是项目加载了一段高德地图的js导致的，该js在首次加载时会使用<code>document.write</code>去复写整个html，因此导致了#subapp-viewport不存在的报错，所以最后是要想办法去掉该js文件就可以了。</p><blockquote><p>小插曲：为什么我们的项目会加载这个高德地图js？我们项目也没有用到啊，这时我们陷入了一个思维误区：qiankun是阿里的，高德也是阿里的，qiankun不会偷偷在渲染时动态加载高德的js做些数据收集吧？非常惭愧会对一个开源项目有这个想法。。。实际上，是因为我司写组件库模板的小伙伴忘记移除调试时<code>public/index.html</code>用到的这个js了，当时还去评论<a href="https://github.com/umijs/qiankun/issues/838">issue</a>了(捂脸哭)。把这个讲出来，是想说遇到bug时还是要先检查一下自己，别轻易就去质疑别人。</p></blockquote><h2>最后</h2><p>本文从开始搭建到部署非常完整地分享了整个架构搭建的一些思路和实践，希望能对大家有所帮助。要提醒一下的是，本示例可能不一定最佳的实践，仅作为一个思路参考，架构是会随着业务需求不断调整变化的，只有合适的才是最好的。</p><p>示例代码： <a href="https://github.com/fengxianqi/qiankun-example">https://github.com/fengxianqi/qiankun-example</a>。</p><p>在线demo：<a href="http://qiankun.fengxianqi.com/">http://qiankun.fengxianqi.com/</a></p><p>单独访问在线子应用：</p><ul><li><a href="http://qiankun.fengxianqi.com/subapp/sub-vue/">subapp/sub-vue</a></li><li><a href="http://qiankun.fengxianqi.com/subapp/sub-react/">subapp/sub-react</a></li></ul><p>最后的最后，喜欢本文的同学还请能顺手给个赞和小星星鼓励一下，非常感谢看到这里。</p><h2>一些参考文章</h2><ul><li><a href="https://xiaomi-info.github.io/2020/04/14/fe-microfrontends-practice/">微前端在小米 CRM 系统的实践</a></li><li><a href="https://juejin.im/post/6844903816295350279">微前端实践</a></li><li><a href="https://zhuanlan.zhihu.com/p/78362028">可能是你见过最完善的微前端解决方案</a></li><li><a href="https://tech.meituan.com/2020/02/27/meituan-waimai-micro-frontends-practice.html">微前端在美团外卖的实践</a></li><li><a href="https://juejin.im/post/6844904185910018062">qiankun 微前端方案实践及总结</a></li></ul><!---赞赏模块---->
+<div class="entry-shang text-center">
+		<p>「一键投喂 软糖/蛋糕/布丁/牛奶/冰阔乐！」</p>
+		<button class="zs show-zs btn btn-bred">赞赏</button>
+	</div>
+	<div class="zs-modal-bg"></div>
+	<div class="zs-modal-box">
+		<div class="zs-modal-head">
+			<button type="button" class="close">×</button>
+			<p class="author">
+                                <img src="微前端qiankun从搭建到部署的实践/15716381" width="32px" height="32px" style="border-radius: 50%;">fengxianqi			</p>
+			<p class="tip"><i></i><span> (๑＞ڡ＜)☆谢谢老板~</span></p>
+		</div>
+		<div class="zs-modal-body">
+			<div class="zs-modal-btns">
+				<button class="btn btn-blink" data-num="2">2元</button>
+				<button class="btn btn-blink" data-num="5">5元</button>
+				<button class="btn btn-blink" data-num="10">10元</button>
+				<button class="btn btn-blink" data-num="50">50元</button>
+				<button class="btn btn-blink" data-num="100">100元</button>
+				<button class="btn btn-blink" data-num="any">任意金额</button>
+			</div>
+			<div class="zs-modal-pay">
+				<button class="btn btn-bred" id="pay-text">2元</button>
+				<p>使用<span id="pay-type">微信</span>扫描二维码完成支付</p>
+				<img width="150" height="150" src="微前端qiankun从搭建到部署的实践/alipay_2.png" id="pay-image">
+			</div>
+		</div>
+		<div class="zs-modal-footer">
+			<label style="float: left;width: 130px;">
+				<input type="radio" name="zs-type" value="alipay" class="zs-type" checked="checked" style="float: left;">
+				<span class="zs-alipay">
+					<img src="微前端qiankun从搭建到部署的实践/alipay-btn.png">
+				</span>
+			</label>
+			<label style="float: left;width: 130px;">
+				<input type="radio" name="zs-type" value="wechat" class="zs-type" style="float: left;">
+				<span class="zs-wechat">
+					<img src="微前端qiankun从搭建到部署的实践/wechat-btn.png">
+				</span>
+			</label>
+		</div>
+	</div>
+<!---赞赏模块---->
+            </div>
+        </div>
+        <div class="tags-box paddingall">
+            版权声明：本文为作者原创，如需转载须联系作者本人同意，未经作者本人同意不得擅自转载。
+        </div>
+        <div class="info">
+            <ul class="post-meta">
+                <li><i class="fa fa-book fa-fw" aria-hidden="true">&nbsp; </i><a href="https://www.fengxianqi.com/index.php/category/web/">前端</a></li>
+                <li><i class="fa fa-calendar" aria-hidden="true">&nbsp; </i><time class="lately-a" datetime="2020-09-23T00:46:00+00:00" itemprop="datePublished">1年前</time></li>
+                <li itemprop="interactionCount"><i class="fa fa-comments-o" aria-hidden="true">&nbsp; </i><a itemprop="discussionUrl" href="https://www.fengxianqi.com/index.php/archives/157/#comments">评论</a></li>
+                <li><i class="fa fa-hand-o-up" aria-hidden="true">&nbsp; </i><span>2291 次浏览</span></li>
+            </ul>
+        </div>
+    </article>
+    <div class="SubtitleBox hidden-md"><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(328);"><h2>为什么要用qiankun</h2></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(610);"><h2>项目架构</h2></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(1213);"><h2>基座配置</h2></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(2803);"><h2>子应用配置</h2></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(2855);"><h3>一、vue子应用</h3></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(4639);"><h3>二、react子应用</h3></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(6540);"><h2>进阶</h2></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(6592);"><h3>全局状态管理</h3></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(8141);"><h3>主应用的状态封装</h3></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(9656);"><h3>vue子应用的状态封装</h3></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(11626);"><h3>子应用切换Loading处理</h3></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(13506);"><h3>抽取公共代码</h3></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(14018);"><h3>子应用支持独立开发</h3></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(15025);"><h3>子应用独立仓库</h3></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(15341);"><h3>子应用独立仓库后聚合管理</h3></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(16656);"><h4>vscode eslint配置</h4></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(17137);"><h3>子应用互相跳转</h3></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(18195);"><h2>性能优化</h2></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(18490);"><h2>部署</h2></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(19513);"><h2>遇到的问题</h2></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(19565);"><h3>一、react子应用启动后，主应用第一次渲染后会挂掉</h3></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(20394);"><h3>二、Uncaught Error: application 'xx' died in status SKIP_BECAUSE_BROKEN: [qiankun] Target container with #subapp-viewport not existed while xx mounting!</h3></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(21061);"><h2>最后</h2></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(21375);"><h2>一些参考文章</h2></a></div><div><a href="https://www.fengxianqi.com/index.php/archives/157/#" onclick="$.TitleLocation(21907.947265625);"></a></div></div>
+    <div class="Card turned">
+        <span style="float: left;padding:2px;"><i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;<a href="https://www.fengxianqi.com/index.php/archives/150/" title="前端部署和提效：从静态到node再到负载均衡">前端部署和提效：从静态到node再到负载均衡</a></span>
+        <span class="num" style="visibility:hidden">1/1</span>
+        <span style="float: right;padding:2px;"><a href="https://www.fengxianqi.com/index.php/archives/160/" title="为什么说rollup比webpack更适合打包库">为什么说rollup比webpack更适合打包库</a>&nbsp;<i class="fa fa-arrow-right" aria-hidden="true"></i></span>
+    </div>
+    <div id="comments" class="Card comment-box-padding">
+					<div id="respond-post-157" class="respond">
+                        <h6>添加新评论</h6>
+			<form method="post" action="https://www.fengxianqi.com/index.php/archives/157/comment" id="comment-form" role="form">
+					<div class="comment-box">
+						<div class="comment-tools">
+							<div class="row row-cm">
+								<div class="col col-cm order-first" style="overflow: hidden;">
+									<div class="emoji-box text-right">
+										
+									<img data-zface="(!)[zface_1.png]" class="z-emoji-img" src="微前端qiankun从搭建到部署的实践/zface_1.png"><img data-zface="(!)[zface_2.png]" class="z-emoji-img" src="微前端qiankun从搭建到部署的实践/zface_2.png"><img data-zface="(!)[zface_3.png]" class="z-emoji-img" src="微前端qiankun从搭建到部署的实践/zface_3.png"><img data-zface="(!)[zface_4.png]" class="z-emoji-img" src="微前端qiankun从搭建到部署的实践/zface_4.png"><img data-zface="(!)[zface_5.png]" class="z-emoji-img" src="微前端qiankun从搭建到部署的实践/zface_5.png"><img data-zface="(!)[zface_6.png]" class="z-emoji-img" src="微前端qiankun从搭建到部署的实践/zface_6.png"><img data-zface="(!)[zface_7.png]" class="z-emoji-img" src="微前端qiankun从搭建到部署的实践/zface_7.png"><img data-zface="(!)[zface_8.png]" class="z-emoji-img" src="微前端qiankun从搭建到部署的实践/zface_8.png"><img data-zface="(!)[zface_9.png]" class="z-emoji-img" src="微前端qiankun从搭建到部署的实践/zface_9.png"><img data-zface="(!)[zface_10.png]" class="z-emoji-img" src="微前端qiankun从搭建到部署的实践/zface_10.png"><img data-zface="(!)[zface_11.png]" class="z-emoji-img" src="微前端qiankun从搭建到部署的实践/zface_11.png"><img data-zface="(!)[zface_12.png]" class="z-emoji-img" src="微前端qiankun从搭建到部署的实践/zface_12.png"><img data-zface="(!)[zface_13.png]" class="z-emoji-img" src="微前端qiankun从搭建到部署的实践/zface_13.png"><img data-zface="(!)[zface_14.png]" class="z-emoji-img" src="微前端qiankun从搭建到部署的实践/zface_14.png"><img data-zface="(!)[zface_15.png]" class="z-emoji-img" src="微前端qiankun从搭建到部署的实践/zface_15.png"><img data-zface="(!)[zface_16.png]" class="z-emoji-img" src="微前端qiankun从搭建到部署的实践/zface_16.png"><img data-zface="(!)[zface_17.png]" class="z-emoji-img" src="微前端qiankun从搭建到部署的实践/zface_17.png"></div>
+								</div>
+								<div class="bg-white">
+									<a href="javascript:;" class="emoji-btn" title="Emoji 表情"><i class="fa fa-smile-o" name="emoji"></i></a>
+								</div>
+							</div>
+						</div>
+						<div class="comment-textarea-box">
+							<textarea rows="8" cols="50" name="text" id="respond-textarea" class="textarea comment-textarea" required=""></textarea>
+						</div>
+						<div class="comment-form">
+							<div class="row comment-form-fields">
+																	<div class="col order-first">
+										<div class="input-group">
+											<div class="input-group-prepend">
+												<span class="input-group-text bg-white" id="ico-name"><i class="fa fa-user-o" aria-hidden="true"></i></span>
+											</div>
+											<input type="text" name="author" id="author" class="form-control" placeholder="昵称" value="" aria-label="Username" aria-describedby="ico-name" required="">
+										</div>
+									</div>
+									<div class="col">
+										<div class="input-group">
+											<div class="input-group-prepend">
+												<span class="input-group-text bg-white" id="ico-email"><i class="fa fa-envelope-o fa-fw" aria-hidden="true"></i></span>
+											</div>
+											<input type="email" name="mail" id="mail" class="form-control" placeholder="邮箱" value="" aria-label="Email" aria-describedby="ico-email" required="">
+										</div>
+									</div>
+									<div class="col order-last">
+										<div class="input-group">
+											<div class="input-group-prepend">
+												<span class="input-group-text bg-white" id="ico-url"><i class="fa fa-internet-explorer" aria-hidden="true"></i></span>
+											</div>
+											<input type="url" name="url" id="url" class="form-control" placeholder="网站" value="" aria-label="Email" aria-describedby="ico-url">
+										</div>
+									</div>
+															</div>
+
+							<button type="submit" class="btn comment-btn">提交</button>
+
+							<a id="cancel-comment-reply-link" href="https://www.fengxianqi.com/index.php/archives/157/#respond-post-157" rel="nofollow" style="display:none" onclick="return TypechoComment.cancelReply();"><i class="fa fa-times fa-lg" aria-hidden="true" title="取消回复"></i></a><div class="clear"></div>
+						</div>
+					</div>		
+			<input type="hidden" name="_" value="052e8c2a44935a509c96c6b4b0129b99"></form>
+		</div>
+	
+			暂无评论	</div>
+</div><!-- end #main-->
+
+
+</div><!-- end .row -->
+</div>
+<div class="GoTop" title="返回顶部"></div>
+</div><!-- end #body -->
+
+<footer id="footer" class="footer" role="contentinfo" chrome-app-version="2.2.0">
+  <em><a href="https://beian.miit.gov.cn/" target="_blank">粤ICP备2020135016号-1</a>
+    © 2022 <a href="https://www.fengxianqi.com/">fengxianqi</a>.
+    由 <a href="https://www.typecho.org/">Typecho</a> 强力驱动.  </em>
+</footer><!-- end #footer -->
+
+            <script src="微前端qiankun从搭建到部署的实践/hm.js.下载"></script><script type="text/javascript" src="微前端qiankun从搭建到部署的实践/highlight.pack.js.下载"></script>
+            <script type="text/javascript">
+                hljs.initHighlightingOnLoad();
+            </script><script src="微前端qiankun从搭建到部署的实践/jquery-3.3.1.min.js.下载"></script>
+<script src="微前端qiankun从搭建到部署的实践/lately.min.js.下载"></script>
+<script src="微前端qiankun从搭建到部署的实践/bootstrap.min.js.下载"></script>
+<script src="微前端qiankun从搭建到部署的实践/highlight.min.js.下载"></script>
+<script src="微前端qiankun从搭建到部署的实践/main.js.下载"></script>
+
+<script type="text/javascript">
+    //获取评论参数
+    var respondId = "respond-post-157";var shuffleScriptVar = (function () {
+    var _Y6WVAL = //'Bx'
+'Bx'+'Mr'//'Mr'
++'9I'//'9I'
++//'O'
+'05'+'2e'//'aed'
++//'im'
+'8'+//'is'
+'is'+'c2'//'8G'
++'a'//'r7'
++'44'//'dI'
++'TkX'//'TkX'
++'93'//'1'
++'5'//'tK'
++//'A57'
+'a'+'50'//'hF'
++//'LHa'
+'9c9'+'6c6'//'yO'
++'tTU'//'tTU'
++'b4'//'IuT'
++/* '7'//'7' */''+'d0'//'d0'
++'b'//'C'
++//'Jw'
+'01'+''///*'dcI'*/'dcI'
++'29'//'0u'
++//'suS'
+'b'+//'w4'
+'9'+//'2'
+'2'+''///*'U'*/'U'
++/* 'pjy'//'pjy' */''+/* 'b'//'b' */''+//'XC'
+'XC'+'m'//'m'
++'9'//'i'
+, _eh1 = [[0,2],[0,2],[0,2],[5,7],[10,13],[22,25],[24,26],[31,32],[31,33],[31,32]];
+    
+    for (var i = 0; i < _eh1.length; i ++) {
+        _Y6WVAL = _Y6WVAL.substring(0, _eh1[i][0]) + _Y6WVAL.substring(_eh1[i][1]);
+    }
+
+    return _Y6WVAL;
+})();var themeUrl = "https://www.fengxianqi.com/usr/themes/7TEC";    hljs.initHighlightingOnLoad();//开启代码高亮插件 highlightjs
+    readyrun();
+  </script>
+		<script>
+	var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?24c546eb30da00692ea454be2950ce92";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+	</script>
+	
+
+</body><div id="edge-translate-notifier-container" class="edge-translate-notifier-center"></div></html>
